@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -176,26 +175,31 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
     public void onChanged(@Nullable List<Message> messages) {
         ArrayList<Event> eventArrayList = new ArrayList<>();
 
+        if (messages == null || messages.size() == 0) {
+            return;
+        }
+
         long lastLocalMessageCreatedTime = 0;
 
         if (mListData != null && mListData.size() > 0) {
             lastLocalMessageCreatedTime = Long.valueOf(mListData.get(mListData.size() - 1).getCreatedTimeStamp());
         }
 
-        if (messages != null && messages.size() > 0) {
-            for (Message message : messages) {
-                if (lastLocalMessageCreatedTime < message.getCreatedAt()) {
+        for (Message message : messages) {
+            if (lastLocalMessageCreatedTime < message.getCreatedAt()) {
 
-                    Event event = Event.fromMessageToEvent(message);
-                    eventArrayList.add(event);
+                Event event = Event.fromMessageToEvent(message);
+                eventArrayList.add(event);
 
-                }
             }
-
-            mListData.addAll(eventArrayList);
-            mAdapter.setListData(mListData);
-            rvChatWindow.smoothScrollToPosition(mListData.size() - 1);
         }
+
+        if (eventArrayList.size() == 0) {
+            return;
+        }
+        mListData.addAll(eventArrayList);
+        mAdapter.setListData(mListData);
+        rvChatWindow.smoothScrollToPosition(mListData.size() - 1);
 
         markMessagesAsSeenOnDb(myId, recipientId);
     }
@@ -232,7 +236,7 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
 
                 if (!TextUtils.isEmpty(message)) {
 
-                    Event event = new Event();
+                    final Event event = new Event();
                     event.setType("message_create");
                     event.getMessageCreate().getTarget().setRecipientId(String.valueOf(recipientId));
                     event.getMessageCreate().getMessageData().setText(message);
@@ -252,6 +256,7 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
                             if (errorCode == 401) {
                                 mActivity.logOut();
                             } else {
+                                mListData.add(event);
                                 mListData.get(mListData.size() - 1).setSent(false);
                                 mAdapter.notifyDataSetChanged();
                                 rvChatWindow.scrollToPosition(mListData.size() - 1);

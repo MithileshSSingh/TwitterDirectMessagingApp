@@ -3,6 +3,7 @@ package com.example.mithilesh.twitterdirectmessageapp;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -10,6 +11,8 @@ import com.twitter.sdk.android.core.DefaultLogger;
 import com.twitter.sdk.android.core.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterConfig;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MyApplication extends MultiDexApplication {
 
@@ -19,6 +22,15 @@ public class MyApplication extends MultiDexApplication {
         setUpTwitter();
         setUpStetho();
         setUpImageLoader();
+        setUpCrashlytics();
+    }
+
+    private void setUpCrashlytics() {
+        Fabric fabric = new Fabric.Builder(this)
+                .kits(new Crashlytics())
+                .debuggable(true)           // Enables Crashlytics debugger
+                .build();
+        Fabric.with(fabric);
     }
 
     private void setUpTwitter() {
