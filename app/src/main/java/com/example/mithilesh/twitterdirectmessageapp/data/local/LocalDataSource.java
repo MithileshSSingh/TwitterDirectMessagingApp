@@ -93,9 +93,9 @@ public class LocalDataSource implements DataSource {
             }
 
             SharedPreferences.Editor editor = sp.edit();
-            editor.putLong(AppConstants.SHARED_PREFERENCE_LAST_MESSAGE_TIME, messageList.get(messageList.size() - 1).getCreatedAt());
+            editor.putLong(AppConstants.SHARED_PREFERENCE_LAST_MESSAGE_TIME, messageList.get(0).getCreatedAt());
             editor.apply();
-            
+
             insertIntoDb(messageList);
             callBack.success();
         } catch (Exception e) {

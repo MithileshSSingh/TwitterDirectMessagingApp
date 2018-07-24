@@ -95,7 +95,6 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
         initJob();
         initRecyclerView();
-        initViewModel();
     }
 
 
@@ -181,6 +180,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
                 mListData.addAll(beanUserList);
                 mAdapter.setListData(mListData);
+                initViewModel();
             }
 
             @Override
@@ -198,6 +198,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
         mPresenter.loadMessageFromRemoteToDb(new LoadMessageFromRemoteToDbCallBack() {
             @Override
             public void success() {
+                initViewModel();
                 Log.v(TAG, "Messages Loaded successfully");
             }
 
@@ -206,6 +207,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
                 if (errorCode == 401) {
                     mActivity.logOut();
                 } else {
+                    initViewModel();
                     Toast.makeText(mActivity, errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
@@ -221,6 +223,8 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     public void onItemClicked(int position) {
 
         BeanUser user = mListData.get(position);
+        user.setUnReadMessageCount(0);
+        mAdapter.notifyItemChanged(position);
         startChatActivity(user);
     }
 

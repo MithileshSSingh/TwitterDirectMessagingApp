@@ -199,7 +199,7 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
         }
         mListData.addAll(eventArrayList);
         mAdapter.setListData(mListData);
-        rvChatWindow.smoothScrollToPosition(mListData.size() - 1);
+        rvChatWindow.scrollToPosition(mListData.size() - 1);
 
         markMessagesAsSeenOnDb(myId, recipientId);
     }
