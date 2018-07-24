@@ -38,7 +38,8 @@ public class Event {
         event.setId(String.valueOf(message.getMessageId()));
         event.setIsSeen(String.valueOf(true));
         event.getMessageCreate().getMessageData().setText(message.getMessage());
-        event.getMessageCreate().getTarget().setRecipientId(String.valueOf(message.getUserId()));
+        event.getMessageCreate().getTarget().setRecipientId(String.valueOf(message.getRecipientId()));
+        event.getMessageCreate().setSenderId(String.valueOf(message.getSenderId()));
 
         return event;
     }
@@ -60,7 +61,8 @@ public class Event {
         // but no worry this is handled in chat fragment where in ONCHANGE()
         // all messages are set to seen = true
         message.setSeen(false);
-        message.setUserId(Long.valueOf(this.getMessageCreate().getTarget().getRecipientId()));
+        message.setSenderId(Long.valueOf(this.getMessageCreate().getSenderId()));
+        message.setRecipientId(Long.valueOf(this.getMessageCreate().getTarget().getRecipientId()));
 
         return message;
     }

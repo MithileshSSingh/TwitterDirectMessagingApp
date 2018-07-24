@@ -133,8 +133,13 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
         if (messages == null || messages.size() == 0 || mUserHashMap.isEmpty()) return;
 
         for (Message message : messages) {
-            BeanUser beanUser = mUserHashMap.get(message.getUserId());
-            int count = beanUser.getUnReadMessageCount()+1;
+            BeanUser beanUser = mUserHashMap.get(message.getSenderId());
+
+            if (beanUser == null) {
+                continue;
+            }
+
+            int count = beanUser.getUnReadMessageCount() + 1;
             beanUser.setUnReadMessageCount(count);
         }
 

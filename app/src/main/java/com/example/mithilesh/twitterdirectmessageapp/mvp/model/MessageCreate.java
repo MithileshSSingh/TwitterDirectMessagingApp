@@ -8,6 +8,11 @@ public class MessageCreate {
     @SerializedName("target")
     @Expose
     private Target target;
+
+    @SerializedName("sender_id")
+    @Expose
+    private String senderId;
+
     @SerializedName("message_data")
     @Expose
     private MessageData messageData;
@@ -32,6 +37,14 @@ public class MessageCreate {
 
     public void setMessageData(MessageData messageData) {
         this.messageData = messageData;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
 }

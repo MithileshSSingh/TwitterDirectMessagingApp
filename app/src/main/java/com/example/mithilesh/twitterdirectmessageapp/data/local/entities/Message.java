@@ -14,8 +14,12 @@ public class Message {
     long messageId;
 
     @NonNull
-    @ColumnInfo(name = "user_id")
-    long userId;
+    @ColumnInfo(name = "sender_id")
+    long senderId;
+
+    @NonNull
+    @ColumnInfo(name = "recipient_id")
+    long recipientId;
 
     @ColumnInfo(name = "user_name")
     String userName;
@@ -48,12 +52,22 @@ public class Message {
         this.messageId = messageId;
     }
 
-    public long getUserId() {
-        return userId;
+    @NonNull
+    public long getSenderId() {
+        return senderId;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setSenderId(@NonNull long senderId) {
+        this.senderId = senderId;
+    }
+
+    @NonNull
+    public long getRecipientId() {
+        return recipientId;
+    }
+
+    public void setRecipientId(@NonNull long recipientId) {
+        this.recipientId = recipientId;
     }
 
     public String getMessage() {

@@ -124,17 +124,15 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
     @Override
     protected void initData() {
 
-        loadMessages();
+//        loadMessages();
     }
 
     private void initRecycleView() {
         mAdapter = new ChatAdapter(mActivity, mListData, this);
         mLayoutManagerRV = new LinearLayoutManager(mActivity.getApplicationContext());
-        RecyclerView.ItemAnimator itemAnimatorVertical = new DefaultItemAnimator();
 
         rvChatWindow.setHasFixedSize(true);
         rvChatWindow.setLayoutManager(mLayoutManagerRV);
-        rvChatWindow.setItemAnimator(itemAnimatorVertical);
         rvChatWindow.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();
