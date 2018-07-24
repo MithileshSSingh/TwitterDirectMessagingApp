@@ -2,10 +2,12 @@ package com.example.mithilesh.twitterdirectmessageapp.data.local;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.mithilesh.twitterdirectmessageapp.data.DataSource;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.Event;
+import com.example.mithilesh.twitterdirectmessageapp.utils.AppConstants;
 import com.twitter.sdk.android.core.TwitterCore;
 
 import java.util.ArrayList;
@@ -75,12 +77,25 @@ public class LocalDataSource implements DataSource {
         try {
             long myId = TwitterCore.getInstance().getSessionManager().getActiveSession().getUserId();
 
+            SharedPreferences sp = mContext.getSharedPreferences(AppConstants.SHARED_PREFERENCE_NAME, mContext.MODE_PRIVATE);
+            long lastMessageTime = sp.getLong(AppConstants.SHARED_PREFERENCE_LAST_MESSAGE_TIME, 0L);
+
             for (Event event : eventList) {
 
-                Message message = event.fromEventToMessage(myId);
-                messageList.add(message);
+                if (Long.valueOf(event.getCreatedTimeStamp()) > lastMessageTime) {
+                    Message message = event.fromEventToMessage(myId);
+                    messageList.add(message);
+                }
             }
 
+            if (messageList.size() == 0) {
+                return;
+            }
+
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putLong(AppConstants.SHARED_PREFERENCE_LAST_MESSAGE_TIME, messageList.get(messageList.size() - 1).getCreatedAt());
+            editor.apply();
+            
             insertIntoDb(messageList);
             callBack.success();
         } catch (Exception e) {

@@ -3,6 +3,9 @@ package com.example.mithilesh.twitterdirectmessageapp.utils;
 
 public class AppConstants {
 
+    public static String SHARED_PREFERENCE_NAME = "direct_message_shared_preference";
+    public static String SHARED_PREFERENCE_LAST_MESSAGE_TIME = "shared_preference_last_message_time";
+
     public static class IntentKey {
         public static final String EXTRA_DATA = "extra_data";
 

@@ -32,4 +32,5 @@ public interface MessageDao {
 
     @Query("UPDATE message SET is_seen = 'true' where sender_id = :userId1 AND recipient_id = :userId2  OR sender_id = :userId2 AND recipient_id = :userId1")
     void updateMessagesToSeen(long userId1, long userId2);
+
 }
