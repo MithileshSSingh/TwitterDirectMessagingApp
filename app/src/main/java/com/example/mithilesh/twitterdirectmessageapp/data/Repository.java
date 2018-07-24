@@ -196,7 +196,7 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public LiveData<List<Message>> getAllUnseenMessages() {
-        return mLocalDataSource.getAllUnseenMessages();
+    public LiveData<List<Message>> getAllUnseenMessages(boolean isSeen) {
+        return mLocalDataSource.getAllUnseenMessages(isSeen);
     }
 }

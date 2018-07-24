@@ -125,16 +125,17 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
     private void initViewModel() {
         mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
-        mMessageViewModel.getAllUnSeenMessages().observe(this, this);
+        mMessageViewModel.getAllUnSeenMessages(false).observe(this, this);
     }
 
     @Override
     public void onChanged(@Nullable List<Message> messages) {
-        if (messages == null || messages.size() == 0) return;
+        if (messages == null || messages.size() == 0 || mUserHashMap.isEmpty()) return;
 
         for (Message message : messages) {
             BeanUser beanUser = mUserHashMap.get(message.getUserId());
-            beanUser.setUnReadMessageCount(beanUser.getUnReadMessageCount() + 1);
+            int count = beanUser.getUnReadMessageCount()+1;
+            beanUser.setUnReadMessageCount(count);
         }
 
         mAdapter.notifyDataSetChanged();
@@ -168,7 +169,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
                     beanUser.setUser(user);
                     beanUser.setUnReadMessageCount(0);
 
-                    mUserHashMap.put(beanUser.getUser().getId(), beanUser);
+                    mUserHashMap.put(Long.valueOf(beanUser.getUser().idStr), beanUser);
 
                     beanUserList.add(beanUser);
                 }

@@ -51,8 +51,8 @@ public abstract class DbHelper extends RoomDatabase {
         return this.messageDao().getAllMessagesByIds(userId1, userId2);
     }
 
-    public LiveData<List<Message>> getAllUnSeenMessages() {
-        return this.messageDao().getAllUnseenMessages();
+    public LiveData<List<Message>> getAllUnSeenMessages(boolean isSeen) {
+        return this.messageDao().getAllUnseenMessages(isSeen);
     }
 
     public void deleteAll() {

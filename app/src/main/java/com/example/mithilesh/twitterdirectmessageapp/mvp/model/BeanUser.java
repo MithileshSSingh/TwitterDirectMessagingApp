@@ -8,7 +8,7 @@ public class BeanUser {
     @SerializedName("un_read_message_count")
     @Expose
     private int unReadMessageCount = 0;
-    @SerializedName("USER")
+    @SerializedName("user")
     @Expose
     private User user;
 

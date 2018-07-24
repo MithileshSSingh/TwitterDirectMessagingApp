@@ -114,7 +114,7 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public LiveData<List<Message>> getAllUnseenMessages() {
-        return mDbHelper.getAllUnSeenMessages();
+    public LiveData<List<Message>> getAllUnseenMessages(boolean isSeen) {
+        return mDbHelper.getAllUnSeenMessages(isSeen);
     }
 }

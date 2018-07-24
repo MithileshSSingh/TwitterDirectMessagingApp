@@ -181,7 +181,7 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public LiveData<List<Message>> getAllUnseenMessages() {
+    public LiveData<List<Message>> getAllUnseenMessages(boolean isSeen) {
         return null;
     }
 }

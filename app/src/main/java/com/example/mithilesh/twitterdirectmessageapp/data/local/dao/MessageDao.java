@@ -27,8 +27,8 @@ public interface MessageDao {
     @Query("SELECT * from message WHERE user_id = :userId1 OR user_id = :userId2 ORDER BY created_at ASC")
     LiveData<List<Message>> getAllMessagesByIds(long userId1, long userId2);
 
-    @Query("SELECT * from message WHERE is_seen = 'false'")
-    LiveData<List<Message>> getAllUnseenMessages();
+    @Query("SELECT * from message WHERE is_seen = :isSeen")
+    LiveData<List<Message>> getAllUnseenMessages(boolean isSeen);
 
     @Query("UPDATE message SET is_seen = 'true' where user_id = :userId1 OR user_id = :userId2")
     void updateMessagesToSeen(long userId1, long userId2);

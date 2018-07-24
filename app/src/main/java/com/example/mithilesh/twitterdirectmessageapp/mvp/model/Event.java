@@ -55,6 +55,10 @@ public class Event {
         message.setMessage(this.getMessageCreate().getMessageData().getText());
         message.setMessageId(Long.valueOf(this.getId()));
         message.setMessageType(this.getType());
+        // This should be true because after sending message
+        // it would be seen only
+        // but no worry this is handled in chat fragment where in ONCHANGE()
+        // all messages are set to seen = true
         message.setSeen(false);
         message.setUserId(Long.valueOf(this.getMessageCreate().getTarget().getRecipientId()));
 

@@ -35,7 +35,7 @@ public interface DataSource {
 
     LiveData<List<Message>> getAllMessagesByIdsFromDb(long userId1, long userId2);
 
-    LiveData<List<Message>> getAllUnseenMessages();
+    LiveData<List<Message>> getAllUnseenMessages(boolean isSeen);
 
 
     interface GetAllFriendsListCallBack {

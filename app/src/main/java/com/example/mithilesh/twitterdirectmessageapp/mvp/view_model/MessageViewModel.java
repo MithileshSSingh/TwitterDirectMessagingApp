@@ -43,10 +43,11 @@ public class MessageViewModel extends AndroidViewModel {
         return mAllMessagesByIds;
     }
 
-    public LiveData<List<Message>> getAllUnSeenMessages(){
-        mAllUnseenMessages = mRepository.getAllUnseenMessages();
+    public LiveData<List<Message>> getAllUnSeenMessages(boolean isSeen) {
+        mAllUnseenMessages = mRepository.getAllUnseenMessages(isSeen);
         return mAllUnseenMessages;
     }
+
     public void insertMessages(List<Message> messages) {
         mRepository.insertIntoDb(messages);
     }

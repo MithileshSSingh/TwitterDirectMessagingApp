@@ -30,7 +30,7 @@ public interface APICalls {
 
         public static final String ALL_FRIENDS = BASE_URL + "/1.1/friends/list.json";
         public static final String SEND_MESSAGE = BASE_URL + "/1.1/direct_messages/events/new.json";
-        public static final String GET_MESSAGES = BASE_URL + "/1.1/direct_messages/events/list.json";
+        public static final String GET_MESSAGES = BASE_URL + "/1.1/direct_messages/events/list.json?count=50";
     }
 }
 
