@@ -146,6 +146,11 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
+    public void setMessageAsSeen(long myId, long recipientId, CommonCallBack callBack) {
+
+    }
+
+    @Override
     public void saveMessageToDb(List<Event> eventList, SaveMessageToDbCallBack callBack) {
 
     }
@@ -172,6 +177,11 @@ public class RemoteDataSource implements DataSource {
 
     @Override
     public LiveData<List<Message>> getAllMessagesByIdsFromDb(long userId1, long userId2) {
+        return null;
+    }
+
+    @Override
+    public LiveData<List<Message>> getAllUnseenMessages() {
         return null;
     }
 }

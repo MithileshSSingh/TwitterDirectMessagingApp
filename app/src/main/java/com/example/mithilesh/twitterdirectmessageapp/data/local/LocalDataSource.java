@@ -60,6 +60,15 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
+    public void setMessageAsSeen(long myId, long recipientId, CommonCallBack callBack) {
+        try {
+            mDbHelper.updateMessagesToSeen(myId, recipientId);
+        } catch (Exception e) {
+            callBack.failed(0, e.getMessage());
+        }
+    }
+
+    @Override
     public void saveMessageToDb(List<Event> eventList, SaveMessageToDbCallBack callBack) {
         ArrayList<Message> messageList = new ArrayList<>();
 
@@ -102,5 +111,10 @@ public class LocalDataSource implements DataSource {
     @Override
     public LiveData<List<Message>> getAllMessagesByIdsFromDb(long userId1, long userId2) {
         return mDbHelper.getAllMessagesByIds(userId1, userId2);
+    }
+
+    @Override
+    public LiveData<List<Message>> getAllUnseenMessages() {
+        return mDbHelper.getAllUnSeenMessages();
     }
 }

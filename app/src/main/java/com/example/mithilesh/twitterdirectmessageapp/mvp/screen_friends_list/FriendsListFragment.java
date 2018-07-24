@@ -1,5 +1,7 @@
 package com.example.mithilesh.twitterdirectmessageapp.mvp.screen_friends_list;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.mithilesh.twitterdirectmessageapp.R;
+import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
 import com.example.mithilesh.twitterdirectmessageapp.di.RepositoryInjector;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.BaseFragment;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.listeners.OnItemClickListener;
@@ -20,6 +23,7 @@ import com.example.mithilesh.twitterdirectmessageapp.mvp.model.BeanUser;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseFriends;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_chat.ChatActivity;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.services.GetDirectMessageJobService;
+import com.example.mithilesh.twitterdirectmessageapp.mvp.view_model.MessageViewModel;
 import com.example.mithilesh.twitterdirectmessageapp.utils.AppConstants;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -31,9 +35,11 @@ import com.firebase.jobdispatcher.Trigger;
 import com.twitter.sdk.android.core.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
-public class FriendsListFragment extends BaseFragment implements FriendsListContract.View, OnItemClickListener {
+public class FriendsListFragment extends BaseFragment implements FriendsListContract.View, OnItemClickListener, Observer<List<Message>> {
 
     public static final String TAG = FriendsListFragment.class.getSimpleName();
 
@@ -44,6 +50,9 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
     private RecyclerView.LayoutManager mLayoutManagerRV;
     private ArrayList<BeanUser> mListData = new ArrayList<>();
+    private MessageViewModel mMessageViewModel;
+
+    private HashMap<Long, BeanUser> mUserHashMap = new HashMap<>();
 
     public FriendsListFragment() {
     }
@@ -86,6 +95,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
         initJob();
         initRecyclerView();
+        initViewModel();
     }
 
 
@@ -113,6 +123,23 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
     }
 
+    private void initViewModel() {
+        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        mMessageViewModel.getAllUnSeenMessages().observe(this, this);
+    }
+
+    @Override
+    public void onChanged(@Nullable List<Message> messages) {
+        if (messages == null || messages.size() == 0) return;
+
+        for (Message message : messages) {
+            BeanUser beanUser = mUserHashMap.get(message.getUserId());
+            beanUser.setUnReadMessageCount(beanUser.getUnReadMessageCount() + 1);
+        }
+
+        mAdapter.notifyDataSetChanged();
+    }
+
     @Override
     protected void initListeners() {
 
@@ -127,19 +154,21 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     private void loadFriendList() {
         mPresenter.getAllFriendsList(new GetAllFriendsListCallBack() {
             @Override
-            public void success(ResponseFriends friendsList) {
+            public void success(ResponseFriends userListResponse) {
                 mListData.clear();
                 ArrayList<BeanUser> beanUserList = new ArrayList<>();
                 ArrayList<User> userList = new ArrayList<>();
 
-                if (friendsList.getUser() != null && friendsList.getUser().size() > 0) {
-                    userList.addAll(friendsList.getUser());
+                if (userListResponse.getUser() != null && userListResponse.getUser().size() > 0) {
+                    userList.addAll(userListResponse.getUser());
                 }
 
                 for (User user : userList) {
                     BeanUser beanUser = new BeanUser();
                     beanUser.setUser(user);
                     beanUser.setUnReadMessageCount(0);
+
+                    mUserHashMap.put(beanUser.getUser().getId(), beanUser);
 
                     beanUserList.add(beanUser);
                 }

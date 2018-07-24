@@ -21,12 +21,21 @@ public class ChatContract {
             void failed(int errorCode, String errorMessage);
         }
 
+
+        interface CommonCallBack {
+            void success();
+
+            void failed(int errorCode, String errorMessage);
+        }
+
     }
 
     interface Presenter extends BasePresenter {
 
         void sendMessage(Event event, View.OnMessageSendCallBack callback);
+
         void loadMessageFromRemoteToDb(View.LoadMessageFromRemoteToDbCallBack callBack);
 
+        void setMessageAsSeen(long myId, long recipientId, View.CommonCallBack callBack);
     }
 }

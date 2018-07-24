@@ -21,6 +21,8 @@ public interface DataSource {
 
     void loadMessageFromRemoteToDb(LoadMessageFromRemoteToDbCallBack callBack);
 
+    void setMessageAsSeen(long myId, long recipientId, CommonCallBack callBack);
+
     void saveMessageToDb(List<Event> eventList, SaveMessageToDbCallBack callBack);
 
     void insertIntoDb(List<Message> messages);
@@ -32,6 +34,8 @@ public interface DataSource {
     LiveData<List<Message>> getAllMessagesByIdFromDb(long userId);
 
     LiveData<List<Message>> getAllMessagesByIdsFromDb(long userId1, long userId2);
+
+    LiveData<List<Message>> getAllUnseenMessages();
 
 
     interface GetAllFriendsListCallBack {
@@ -63,4 +67,11 @@ public interface DataSource {
 
         void failed(int errorCode, String errorMessage);
     }
+
+    interface CommonCallBack {
+        void success();
+
+        void failed(int errorCode, String errorMessage);
+    }
+
 }

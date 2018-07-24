@@ -150,6 +150,21 @@ public class Repository implements DataSource {
     }
 
     @Override
+    public void setMessageAsSeen(long myId, long recipientId, final CommonCallBack callBack) {
+        mLocalDataSource.setMessageAsSeen(myId, recipientId, new CommonCallBack() {
+            @Override
+            public void success() {
+                callBack.success();
+            }
+
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                callBack.failed(errorCode, errorMessage);
+            }
+        });
+    }
+
+    @Override
     public void saveMessageToDb(List<Event> eventList, SaveMessageToDbCallBack callBack) {
 
     }
@@ -178,5 +193,10 @@ public class Repository implements DataSource {
     @Override
     public LiveData<List<Message>> getAllMessagesByIdsFromDb(long userId1, long userId2) {
         return mLocalDataSource.getAllMessagesByIdsFromDb(userId1, userId2);
+    }
+
+    @Override
+    public LiveData<List<Message>> getAllUnseenMessages() {
+        return mLocalDataSource.getAllUnseenMessages();
     }
 }

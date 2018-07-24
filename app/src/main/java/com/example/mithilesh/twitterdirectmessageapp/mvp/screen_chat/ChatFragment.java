@@ -198,6 +198,22 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
             mAdapter.setListData(mListData);
             rvChatWindow.smoothScrollToPosition(mListData.size() - 1);
         }
+
+        markMessagesAsSeenOnDb(myId, recipientId);
+    }
+
+    private void markMessagesAsSeenOnDb(long myId, long recipientId) {
+        mPresenter.setMessageAsSeen(myId, recipientId, new CommonCallBack() {
+            @Override
+            public void success() {
+                Log.v(TAG, "messages updated as read");
+            }
+
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                Log.v(TAG, "error while update : error : " + errorMessage);
+            }
+        });
     }
 
     @Override

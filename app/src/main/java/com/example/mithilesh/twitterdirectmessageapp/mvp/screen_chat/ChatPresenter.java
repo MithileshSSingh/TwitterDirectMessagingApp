@@ -53,4 +53,19 @@ public class ChatPresenter implements ChatContract.Presenter {
             }
         });
     }
+
+    @Override
+    public void setMessageAsSeen(long myId, long recipientId, final ChatContract.View.CommonCallBack callBack) {
+        mRepository.setMessageAsSeen(myId, recipientId, new DataSource.CommonCallBack() {
+            @Override
+            public void success() {
+                callBack.success();
+            }
+
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                callBack.failed(errorCode, errorMessage);
+            }
+        });
+    }
 }
