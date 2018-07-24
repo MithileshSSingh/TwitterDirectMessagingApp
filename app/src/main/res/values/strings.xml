@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">TwitterMessageApp</string>
+
+    <string name="title_login">Login</string>
+    <string name="title_friend_list">Friend List</string>
+    <string name="title_chat_window">Chat Window</string>
+
+    <string name="default_notification_channel_id">10000</string>
+    <string name="twitter_consumer_key">dyTvRhh70IP9RcFISdLaTEi4d</string>
+    <string name="twitter_consumer_secret">lfFaQzdXu04GTzjDCwF4CGXCsCVm06TSwblSCCGJiI6v4LeNZ6</string>
+</resources>

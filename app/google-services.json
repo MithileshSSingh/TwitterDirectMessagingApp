@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "165826636679",
+    "firebase_url": "https://twitterdirectmessaging.firebaseio.com",
+    "project_id": "twitterdirectmessaging",
+    "storage_bucket": "twitterdirectmessaging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165826636679:android:075fe63ba298af58",
+        "android_client_info": {
+          "package_name": "com.example.mithilesh.twitterdirectmessageapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "165826636679-hi6jl6f8mtja07gb7hpj6r0o7skmbm43.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mithilesh.twitterdirectmessageapp",
+            "certificate_hash": "345faa5447e45216fb057f82eb6cf403ffe9f8c2"
+          }
+        },
+        {
+          "client_id": "165826636679-da1sgg9vjta1kigr3b1sdq2jtlsjjf95.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcEjbNDJ85B5WGoBwljOyalBrbEEfDfaE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "165826636679-da1sgg9vjta1kigr3b1sdq2jtlsjjf95.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

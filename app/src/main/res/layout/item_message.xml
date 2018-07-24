@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="1dp">
+
+    <LinearLayout
+        android:id="@+id/llMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp" />
+
+        <ImageView
+            android:id="@+id/ivNotSent"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="right"
+            android:background="@drawable/ic_clear_black_24dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/ivSent"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="right"
+            android:background="@drawable/ic_done_black_24dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/ivRefresh"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="right"
+            android:background="@drawable/ic_refresh_black_24dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</RelativeLayout>
