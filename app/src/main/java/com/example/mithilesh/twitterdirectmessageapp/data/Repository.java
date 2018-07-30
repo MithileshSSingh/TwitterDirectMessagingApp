@@ -183,7 +183,7 @@ public class Repository implements DataSource {
                 }
 
                 if (listTwitterUser.size() > 0) {
-                    mLocalDataSource.insertUserIntoDb(listTwitterUser);
+                    mLocalDataSource.updateUserIntoDb(listTwitterUser);
                 }
 
                 callBack.success(users);
@@ -230,6 +230,11 @@ public class Repository implements DataSource {
     @Override
     public void insertUserIntoDb(List<TwitterUser> twitterUser) {
         mLocalDataSource.insertUserIntoDb(twitterUser);
+    }
+
+    @Override
+    public void updateUserIntoDb(List<TwitterUser> twitterUsers) {
+
     }
 
     @Override

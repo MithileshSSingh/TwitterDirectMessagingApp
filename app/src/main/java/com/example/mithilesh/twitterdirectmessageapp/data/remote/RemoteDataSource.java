@@ -191,6 +191,11 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
+    public void updateUserIntoDb(List<TwitterUser> twitterUsers) {
+
+    }
+
+    @Override
     public void deleteAllUserFromDb() {
 
     }

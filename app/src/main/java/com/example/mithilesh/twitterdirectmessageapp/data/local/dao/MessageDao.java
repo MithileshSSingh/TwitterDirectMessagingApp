@@ -13,7 +13,7 @@ import java.util.List;
 @Dao
 public interface MessageDao {
     @Insert
-    void insert(Message message);
+    void insert(Message... message);
 
     @Query("DELETE FROM message")
     void deleteAll();

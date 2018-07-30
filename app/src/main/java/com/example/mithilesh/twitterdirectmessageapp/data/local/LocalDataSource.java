@@ -9,6 +9,7 @@ import com.example.mithilesh.twitterdirectmessageapp.data.local.asyncs.DeleteMes
 import com.example.mithilesh.twitterdirectmessageapp.data.local.asyncs.InsertMessageAsyncTask;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.asyncs.InsertUserAsyncTask;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.asyncs.UpdateMessageAsyncTask;
+import com.example.mithilesh.twitterdirectmessageapp.data.local.asyncs.UpdateUserAsyncTask;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.TwitterUser;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.Event;
@@ -130,6 +131,17 @@ public class LocalDataSource implements DataSource {
         if (twitterUsers != null && twitterUsers.size() > 0) {
             new InsertUserAsyncTask(mDbHelper.twitterUserDao()).execute(twitterUsers);
         }
+    }
+
+    @Override
+    public void updateUserIntoDb(List<TwitterUser> twitterUsers) {
+
+        if (twitterUsers != null && twitterUsers.size() > 0) {
+            ArrayList<TwitterUser> twitterUserArrayList = new ArrayList<>();
+            twitterUserArrayList.addAll(twitterUsers);
+            new UpdateUserAsyncTask(mDbHelper.twitterUserDao()).execute(twitterUserArrayList);
+        }
+
     }
 
     @Override

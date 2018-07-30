@@ -21,12 +21,10 @@ public class InsertMessageAsyncTask extends AsyncTask<List<Message>, Void, Void>
         List<Message> messagesList = lists[0];
 
         synchronized (this) {
-            for (Message message : messagesList) {
-                try {
-                    mAsyncTaskDao.insert(message);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                mAsyncTaskDao.insert(messagesList.toArray(new Message[messagesList.size()]));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
         }

@@ -33,6 +33,8 @@ public interface DataSource {
 
     void insertUserIntoDb(List<TwitterUser> twitterUser);
 
+    void updateUserIntoDb(List<TwitterUser> twitterUsers);
+
     void deleteAllUserFromDb();
 
     TwitterUser getUserById(long userId);

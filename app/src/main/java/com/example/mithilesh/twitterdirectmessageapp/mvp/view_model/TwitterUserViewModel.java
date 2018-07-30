@@ -23,7 +23,7 @@ public class TwitterUserViewModel extends AndroidViewModel {
         mAllUsers = mRepository.getAllUsers();
     }
 
-    public LiveData<List<TwitterUser>> getmAllUsers() {
+    public LiveData<List<TwitterUser>> getAllUsers() {
         return mAllUsers;
     }
 }

@@ -5,12 +5,17 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -73,6 +78,26 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        MenuItem searchViewItem = menu.findItem(R.id.action_search);
+        final SearchView searchViewAndroidActionBar = (SearchView) MenuItemCompat.getActionView(searchViewItem);
+        searchViewAndroidActionBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchViewAndroidActionBar.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                handleSearch(newText);
+                return true;
+            }
+        });
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setScreenTitle(getString(R.string.title_friend_list));
@@ -127,7 +152,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
     private void initTwitterUserViewModel() {
         mTwitterUserViewModel = ViewModelProviders.of(this).get(TwitterUserViewModel.class);
-        mTwitterUserViewModel.getmAllUsers().observe(this, new Observer<List<TwitterUser>>() {
+        mTwitterUserViewModel.getAllUsers().observe(this, new Observer<List<TwitterUser>>() {
             @Override
             public void onChanged(@Nullable List<TwitterUser> twitterUsers) {
                 mUserListData.clear();
@@ -246,6 +271,10 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
                 }
             }
         });
+    }
+
+    private void handleSearch(String newText) {
+
     }
 
     @Override
