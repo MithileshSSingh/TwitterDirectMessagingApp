@@ -150,6 +150,11 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
+    public void searchUser(String userName, SearchUserCallBack callBack) {
+
+    }
+
+    @Override
     public TwitterUser getUserById(long userId) {
         return mDbHelper.twitterUserDao().getUserById(userId);
     }

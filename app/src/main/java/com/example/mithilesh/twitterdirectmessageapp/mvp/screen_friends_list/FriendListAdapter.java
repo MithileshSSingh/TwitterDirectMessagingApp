@@ -187,7 +187,7 @@ class FriendViewHolder extends RecyclerView.ViewHolder implements BaseViewHolder
 
     @Override
     public void onClick(View view) {
-        mListener.onItemClicked(mPosition);
+        mListener.onItemClicked(mPosition, mData);
     }
 }
 

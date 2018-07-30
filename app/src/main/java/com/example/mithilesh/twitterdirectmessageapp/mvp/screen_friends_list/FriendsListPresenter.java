@@ -2,6 +2,8 @@ package com.example.mithilesh.twitterdirectmessageapp.mvp.screen_friends_list;
 
 import com.example.mithilesh.twitterdirectmessageapp.data.DataSource;
 import com.example.mithilesh.twitterdirectmessageapp.data.Repository;
+import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.TwitterUser;
+import com.example.mithilesh.twitterdirectmessageapp.mvp.model.BeanUser;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.Event;
 import com.twitter.sdk.android.core.models.User;
 
@@ -46,6 +48,39 @@ public class FriendsListPresenter implements FriendsListContract.Presenter {
             @Override
             public void success(ArrayList<User> user) {
                 callBack.success();
+            }
+
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                callBack.failed(errorCode, errorMessage);
+            }
+        });
+    }
+
+    @Override
+    public void searchUser(final String userName, final FriendsListContract.View.SearchUserCallBack callBack) {
+
+        mRepository.searchUser(userName, new DataSource.SearchUserCallBack() {
+            @Override
+            public void success(ArrayList<User> dataList) {
+                ArrayList<BeanUser> beanUserArrayList = new ArrayList<>();
+
+                for (User user : dataList) {
+                    BeanUser beanUser = new BeanUser();
+                    TwitterUser twitterUser = new TwitterUser();
+
+                    twitterUser.setUserId(String.valueOf(user.getId()));
+                    twitterUser.setProfileImageUrl(user.profileImageUrlHttps);
+                    twitterUser.setUserName(user.name);
+                    twitterUser.setUserScreenName(user.screenName);
+
+                    beanUser.setUnReadMessageCount(0);
+                    beanUser.setUser(twitterUser);
+
+                    beanUserArrayList.add(beanUser);
+                }
+
+                callBack.success(beanUserArrayList);
             }
 
             @Override

@@ -5,5 +5,5 @@ package com.example.mithilesh.twitterdirectmessageapp.mvp.listeners;
  */
 
 public interface OnItemClickListener {
-    void onItemClicked(int position);
+    void onItemClicked(int position,Object data);
 }

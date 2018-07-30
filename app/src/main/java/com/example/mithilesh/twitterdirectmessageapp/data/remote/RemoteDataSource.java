@@ -87,7 +87,8 @@ public class RemoteDataSource implements DataSource {
             @Override
             public void failure(TwitterException exception) {
                 exception.printStackTrace();
-                callback.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
+                ApiError apiError = ApiError.getApiError(exception.fillInStackTrace());
+                callback.failed(apiError.errorCode, apiError.msgError);
             }
         });
     }
@@ -107,7 +108,8 @@ public class RemoteDataSource implements DataSource {
             @Override
             public void failure(TwitterException exception) {
                 exception.printStackTrace();
-                callBack.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
+                ApiError apiError = ApiError.getApiError(exception.fillInStackTrace());
+                callBack.failed(apiError.errorCode, apiError.msgError);
             }
         });
     }
@@ -127,8 +129,11 @@ public class RemoteDataSource implements DataSource {
 
             @Override
             public void failure(TwitterException exception) {
+
                 exception.printStackTrace();
-                callBack.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
+                ApiError apiError = ApiError.getApiError(exception.fillInStackTrace());
+                callBack.failed(apiError.errorCode, apiError.msgError);
+
             }
         });
     }
@@ -158,8 +163,11 @@ public class RemoteDataSource implements DataSource {
 
             @Override
             public void failure(TwitterException exception) {
+
                 exception.printStackTrace();
-                callBack.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
+                ApiError apiError = ApiError.getApiError(exception.fillInStackTrace());
+                callBack.failed(apiError.errorCode, apiError.msgError);
+
             }
         });
 
@@ -198,6 +206,32 @@ public class RemoteDataSource implements DataSource {
     @Override
     public void deleteAllUserFromDb() {
 
+    }
+
+    @Override
+    public void searchUser(String userName, final SearchUserCallBack callBack) {
+        Call<List<User>> call = mApiClient.getAPICalls().searchUserByQuery(userName);
+
+        call.enqueue(new Callback<List<User>>() {
+            @Override
+            public void success(Result<List<User>> result) {
+                ArrayList<User> userArrayList = new ArrayList<>();
+
+                if (result.data != null) {
+                    userArrayList.addAll(result.data);
+                }
+
+                callBack.success(userArrayList);
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                exception.printStackTrace();
+                ApiError apiError = ApiError.getApiError(exception.fillInStackTrace());
+                callBack.failed(apiError.errorCode, apiError.msgError);
+
+            }
+        });
     }
 
     @Override

@@ -141,7 +141,7 @@ class ChatViewHolder extends RecyclerView.ViewHolder implements BaseViewHolder<E
 
     @Override
     public void onClick(View view) {
-        mListener.onItemClicked(mPosition);
+        mListener.onItemClicked(mPosition, mData);
     }
 }
 

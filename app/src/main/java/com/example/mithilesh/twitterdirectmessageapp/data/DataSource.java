@@ -5,9 +5,11 @@ import android.arch.lifecycle.LiveData;
 
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.TwitterUser;
+import com.example.mithilesh.twitterdirectmessageapp.mvp.model.BeanUser;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.Event;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseGetMessage;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseSendMessage;
+import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_friends_list.FriendsListContract;
 import com.twitter.sdk.android.core.models.User;
 
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public interface DataSource {
     void updateUserIntoDb(List<TwitterUser> twitterUsers);
 
     void deleteAllUserFromDb();
+
+    void searchUser(String userName,SearchUserCallBack callBack);
 
     TwitterUser getUserById(long userId);
 
@@ -81,6 +85,13 @@ public interface DataSource {
 
     interface LoadUserFromRemoteToDbCallBack {
         void success(ArrayList<User> user);
+
+        void failed(int errorCode, String errorMessage);
+    }
+
+
+    interface SearchUserCallBack {
+        void success(ArrayList<User> dataList);
 
         void failed(int errorCode, String errorMessage);
     }

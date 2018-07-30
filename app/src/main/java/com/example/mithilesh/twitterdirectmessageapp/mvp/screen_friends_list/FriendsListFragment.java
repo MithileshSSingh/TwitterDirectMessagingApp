@@ -61,6 +61,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     private TwitterUserViewModel mTwitterUserViewModel;
 
     private HashMap<Long, BeanUser> mUserHashMap = new HashMap<>();
+    private SearchView mSearchViewAndroidActionBar;
 
     public FriendsListFragment() {
     }
@@ -81,17 +82,22 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
         MenuItem searchViewItem = menu.findItem(R.id.action_search);
-        final SearchView searchViewAndroidActionBar = (SearchView) MenuItemCompat.getActionView(searchViewItem);
-        searchViewAndroidActionBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchViewAndroidActionBar = (SearchView) MenuItemCompat.getActionView(searchViewItem);
+        mSearchViewAndroidActionBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchViewAndroidActionBar.clearFocus();
+                mSearchViewAndroidActionBar.clearFocus();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                handleSearch(newText);
+                if (TextUtils.isEmpty(newText)) {
+                    mAdapter.setListData(mUserListData);
+                    mAdapter.notifyDataSetChanged();
+                } else {
+                    handleSearch(newText);
+                }
                 return true;
             }
         });
@@ -237,7 +243,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
             @Override
             public void failed(int errorCode, String errorMessage) {
-                Log.v(TAG,errorMessage);
+                Log.v(TAG, errorMessage);
                 if (mActivity != null) {
                     if (errorCode == 401) {
                         mActivity.logOut();
@@ -261,7 +267,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
             @Override
             public void failed(int errorCode, String errorMessage) {
-                Log.v(TAG,errorMessage);
+                Log.v(TAG, errorMessage);
                 if (mActivity != null) {
                     if (errorCode == 401) {
                         mActivity.logOut();
@@ -274,7 +280,25 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     }
 
     private void handleSearch(String newText) {
+        mPresenter.searchUser(newText, new SearchUserCallBack() {
+            @Override
+            public void success(ArrayList<BeanUser> dataList) {
+                mAdapter.setListData(dataList);
+                mAdapter.notifyDataSetChanged();
+            }
 
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                Log.v(TAG, errorMessage);
+                if (mActivity != null) {
+                    if (errorCode == 401) {
+                        mActivity.logOut();
+                    } else {
+                        Toast.makeText(mActivity, errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -283,12 +307,13 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     }
 
     @Override
-    public void onItemClicked(int position) {
+    public void onItemClicked(int position, Object data) {
 
-        BeanUser user = mUserListData.get(position);
+        BeanUser user = (BeanUser) data;
         user.setUnReadMessageCount(0);
-        mAdapter.notifyItemChanged(position);
+        mAdapter.notifyItemChanged(position < mUserListData.size() ? position : 0);
         startChatActivity(user);
+
     }
 
     private void startChatActivity(BeanUser user) {

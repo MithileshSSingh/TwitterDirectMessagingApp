@@ -243,6 +243,21 @@ public class Repository implements DataSource {
     }
 
     @Override
+    public void searchUser(String userName, final SearchUserCallBack callBack) {
+        mRemoteDataSource.searchUser(userName, new SearchUserCallBack() {
+            @Override
+            public void success(ArrayList<User> dataList) {
+                callBack.success(dataList);
+            }
+
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                callBack.failed(errorCode,errorMessage);
+            }
+        });
+    }
+
+    @Override
     public TwitterUser getUserById(long userId) {
         return mLocalDataSource.getUserById(userId);
     }

@@ -1,5 +1,6 @@
 package com.example.mithilesh.twitterdirectmessageapp.data.remote;
 
+import com.example.mithilesh.twitterdirectmessageapp.mvp.BaseFragment;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.RequestSendMessage;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseGetMessage;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseGetUsersDetails;
@@ -25,6 +26,9 @@ public interface APICalls {
     @GET(ServiceType.GET_USERS_DETAIL)
     Call<List<User>> getUsersDetails(@Query("user_id") String userIds);
 
+    @GET(ServiceType.GET_SEARCH_USER)
+    Call<List<User>> searchUserByQuery(@Query("q") String query);
+
     class HttpErrorCode {
         public static final Integer NO_CODE = 000;
         public static final Integer LOGIN_FAILED = 401;
@@ -37,6 +41,7 @@ public interface APICalls {
         public static final String SEND_MESSAGE = BASE_URL + "/1.1/direct_messages/events/new.json";
         public static final String GET_MESSAGES = BASE_URL + "/1.1/direct_messages/events/list.json?count=50";
         public static final String GET_USERS_DETAIL = BASE_URL + "/1.1/users/lookup.json";
+        public static final String GET_SEARCH_USER = BASE_URL +"/1.1/users/search.json";
     }
 }
 

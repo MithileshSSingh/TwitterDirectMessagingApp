@@ -224,7 +224,7 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
     }
 
     @Override
-    public void onItemClicked(int position) {
+    public void onItemClicked(int position, Object data) {
 
     }
 
@@ -252,6 +252,8 @@ public class ChatFragment extends BaseFragment implements ChatContract.View, OnI
                         @Override
                         public void failed(int errorCode, String errorMsg) {
                             Log.v(TAG, "failed to send message : error : " + errorMsg);
+
+                            Toast.makeText(mActivity, errorMsg, Toast.LENGTH_LONG).show();
 
                             if (errorCode == 401) {
                                 mActivity.logOut();
