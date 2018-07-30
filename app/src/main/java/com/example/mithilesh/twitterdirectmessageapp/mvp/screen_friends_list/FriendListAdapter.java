@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,8 @@ class FriendViewHolder extends RecyclerView.ViewHolder implements BaseViewHolder
     private BeanUser mData;
 
     private TextView tvName;
+    private TextView tvScreenName;
+
     private ImageView ivProfilePic;
 
     private ProgressBar progressBar;
@@ -99,8 +102,9 @@ class FriendViewHolder extends RecyclerView.ViewHolder implements BaseViewHolder
 
     private void initView() {
         tvName = mView.findViewById(R.id.tvName);
-        ivProfilePic = mView.findViewById(R.id.ivProfilePic);
+        tvScreenName = mView.findViewById(R.id.tvScreenName);
 
+        ivProfilePic = mView.findViewById(R.id.ivProfilePic);
         progressBar = mView.findViewById(R.id.progressBar);
         rootLayout = mView.findViewById(R.id.rootLayout);
 
@@ -118,7 +122,13 @@ class FriendViewHolder extends RecyclerView.ViewHolder implements BaseViewHolder
          * Setting the data here
          */
 
-        tvName.setText(mData.getUser().screenName);
+        String userName = TextUtils.isEmpty(mData.getUser().getUserName()) ? "" : mData.getUser().getUserName();
+        String userScreenName = TextUtils.isEmpty(mData.getUser().getUserScreenName()) ? "" : "@" + mData.getUser().getUserScreenName();
+        String userProfilePicUrl = TextUtils.isEmpty(mData.getUser().getProfileImageUrl()) ? "" : mData.getUser().getProfileImageUrl();
+
+        tvName.setText(userName);
+        tvScreenName.setText(String.valueOf(userScreenName));
+
         if (mData.getUnReadMessageCount() > 0) {
             tvNewMessageCount.setVisibility(View.VISIBLE);
             tvNewMessageCount.setText(String.valueOf(mData.getUnReadMessageCount()));
@@ -132,7 +142,7 @@ class FriendViewHolder extends RecyclerView.ViewHolder implements BaseViewHolder
                 .showImageOnFail(android.R.drawable.stat_notify_error).cacheOnDisk(false).imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
                 .bitmapConfig(Bitmap.Config.ARGB_8888).build();
 
-        imageLoader.displayImage(mData.getUser().profileImageUrlHttps, ivProfilePic, options, new ImageLoadingListener() {
+        imageLoader.displayImage(userProfilePicUrl, ivProfilePic, options, new ImageLoadingListener() {
             @Override
             public void onLoadingStarted(String imageUri, View view) {
                 progressBar.setVisibility(View.VISIBLE);

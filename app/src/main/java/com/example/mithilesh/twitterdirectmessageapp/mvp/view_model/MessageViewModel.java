@@ -49,10 +49,10 @@ public class MessageViewModel extends AndroidViewModel {
     }
 
     public void insertMessages(List<Message> messages) {
-        mRepository.insertIntoDb(messages);
+        mRepository.insertMessageIntoDb(messages);
     }
 
     public void deleteAllMessages() {
-        mRepository.deleteAllFromDb();
+        mRepository.deleteAllMessagesFromDb();
     }
 }

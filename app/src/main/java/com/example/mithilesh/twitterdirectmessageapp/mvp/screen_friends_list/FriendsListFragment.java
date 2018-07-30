@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +17,15 @@ import android.widget.Toast;
 
 import com.example.mithilesh.twitterdirectmessageapp.R;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
+import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.TwitterUser;
 import com.example.mithilesh.twitterdirectmessageapp.di.RepositoryInjector;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.BaseFragment;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.listeners.OnItemClickListener;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.BeanUser;
-import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseFriends;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_chat.ChatActivity;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.services.GetDirectMessageJobService;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.view_model.MessageViewModel;
+import com.example.mithilesh.twitterdirectmessageapp.mvp.view_model.TwitterUserViewModel;
 import com.example.mithilesh.twitterdirectmessageapp.utils.AppConstants;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -32,14 +34,13 @@ import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
-import com.twitter.sdk.android.core.models.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 
-public class FriendsListFragment extends BaseFragment implements FriendsListContract.View, OnItemClickListener, Observer<List<Message>> {
+public class FriendsListFragment extends BaseFragment implements FriendsListContract.View, OnItemClickListener {
 
     public static final String TAG = FriendsListFragment.class.getSimpleName();
 
@@ -49,8 +50,10 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     private FriendListAdapter mAdapter;
 
     private RecyclerView.LayoutManager mLayoutManagerRV;
-    private ArrayList<BeanUser> mListData = new ArrayList<>();
+    private ArrayList<BeanUser> mUserListData = new ArrayList<>();
+
     private MessageViewModel mMessageViewModel;
+    private TwitterUserViewModel mTwitterUserViewModel;
 
     private HashMap<Long, BeanUser> mUserHashMap = new HashMap<>();
 
@@ -108,7 +111,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
     private void initRecyclerView() {
 
-        mAdapter = new FriendListAdapter(mActivity, mListData, this);
+        mAdapter = new FriendListAdapter(mActivity, mUserListData, this);
         mLayoutManagerRV = new LinearLayoutManager(mActivity.getApplicationContext());
         RecyclerView.ItemAnimator itemAnimatorVertical = new DefaultItemAnimator();
 
@@ -122,93 +125,124 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
 
     }
 
-    private void initViewModel() {
-        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
-        mMessageViewModel.getAllUnSeenMessages(false).observe(this, this);
-    }
-
-    @Override
-    public void onChanged(@Nullable List<Message> messages) {
-        if (messages == null || messages.size() == 0 || mUserHashMap.isEmpty()) return;
-
-        for (Message message : messages) {
-            BeanUser beanUser = mUserHashMap.get(message.getSenderId());
-
-            if (beanUser == null) {
-                continue;
-            }
-
-            int count = beanUser.getUnReadMessageCount() + 1;
-            beanUser.setUnReadMessageCount(count);
-        }
-
-        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    protected void initListeners() {
-
-    }
-
-    @Override
-    protected void initData() {
-        loadFriendList();
-        loadMessages();
-    }
-
-    private void loadFriendList() {
-        mPresenter.getAllFriendsList(new GetAllFriendsListCallBack() {
+    private void initTwitterUserViewModel() {
+        mTwitterUserViewModel = ViewModelProviders.of(this).get(TwitterUserViewModel.class);
+        mTwitterUserViewModel.getmAllUsers().observe(this, new Observer<List<TwitterUser>>() {
             @Override
-            public void success(ResponseFriends userListResponse) {
-                mListData.clear();
+            public void onChanged(@Nullable List<TwitterUser> twitterUsers) {
+                mUserListData.clear();
                 ArrayList<BeanUser> beanUserList = new ArrayList<>();
-                ArrayList<User> userList = new ArrayList<>();
+                ArrayList<TwitterUser> userList = new ArrayList<>();
+                ArrayList<String> userIdList = new ArrayList<>();
 
-                if (userListResponse.getUser() != null && userListResponse.getUser().size() > 0) {
-                    userList.addAll(userListResponse.getUser());
+                if (twitterUsers != null && twitterUsers.size() > 0) {
+                    userList.addAll(twitterUsers);
                 }
 
-                for (User user : userList) {
+                for (TwitterUser user : userList) {
                     BeanUser beanUser = new BeanUser();
                     beanUser.setUser(user);
                     beanUser.setUnReadMessageCount(0);
 
-                    mUserHashMap.put(Long.valueOf(beanUser.getUser().idStr), beanUser);
+                    mUserHashMap.put(Long.valueOf(beanUser.getUser().getUserId()), beanUser);
+
+                    if (TextUtils.isEmpty(beanUser.getUser().getProfileImageUrl()) && TextUtils.isEmpty(beanUser.getUser().getUserScreenName()) && TextUtils.isEmpty(beanUser.getUser().getUserName())) {
+
+                        userIdList.add(beanUser.getUser().getUserId());
+
+                    }
+
 
                     beanUserList.add(beanUser);
                 }
 
-                mListData.addAll(beanUserList);
-                mAdapter.setListData(mListData);
-                initViewModel();
+                mUserListData.addAll(beanUserList);
+                mAdapter.setListData(mUserListData);
+                initMessageViewModel();
+
+                if (userIdList.size() > 0) {
+                    loadUserDetail(userIdList);
+                }
+
             }
 
+        });
+    }
+
+    private void initMessageViewModel() {
+        mMessageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        mMessageViewModel.getAllUnSeenMessages(false).observe(this, new Observer<List<Message>>() {
             @Override
-            public void failed(int errorCode, String errorMessage) {
-                if (errorCode == 401) {
-                    mActivity.logOut();
-                } else {
-                    Toast.makeText(mActivity, errorMessage, Toast.LENGTH_LONG).show();
+            public void onChanged(@Nullable List<Message> messages) {
+                if (messages == null || messages.size() == 0 || mUserHashMap.isEmpty()) return;
+
+                for (Message message : messages) {
+                    BeanUser beanUser = mUserHashMap.get(message.getSenderId());
+
+                    if (beanUser == null) {
+                        continue;
+                    }
+
+                    int count = beanUser.getUnReadMessageCount() + 1;
+                    beanUser.setUnReadMessageCount(count);
                 }
+
+                mAdapter.notifyDataSetChanged();
+
             }
         });
+    }
+
+    @Override
+    protected void initListeners() {
+    }
+
+    @Override
+    protected void initData() {
+        loadMessages();
     }
 
     private void loadMessages() {
         mPresenter.loadMessageFromRemoteToDb(new LoadMessageFromRemoteToDbCallBack() {
             @Override
             public void success() {
-                initViewModel();
+                initTwitterUserViewModel();
                 Log.v(TAG, "Messages Loaded successfully");
             }
 
             @Override
             public void failed(int errorCode, String errorMessage) {
-                if (errorCode == 401) {
-                    mActivity.logOut();
-                } else {
-                    initViewModel();
-                    Toast.makeText(mActivity, errorMessage, Toast.LENGTH_LONG).show();
+                Log.v(TAG,errorMessage);
+                if (mActivity != null) {
+                    if (errorCode == 401) {
+                        mActivity.logOut();
+                    } else {
+                        initTwitterUserViewModel();
+                        Toast.makeText(mActivity, errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+    }
+
+
+    private void loadUserDetail(ArrayList<String> userIdList) {
+
+        mPresenter.loadUserDetailFromRemoteToDb(userIdList, new LoadUserDetailsCallBack() {
+            @Override
+            public void success() {
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                Log.v(TAG,errorMessage);
+                if (mActivity != null) {
+                    if (errorCode == 401) {
+                        mActivity.logOut();
+                    } else {
+                        Toast.makeText(mActivity, errorMessage, Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
@@ -222,7 +256,7 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
     @Override
     public void onItemClicked(int position) {
 
-        BeanUser user = mListData.get(position);
+        BeanUser user = mUserListData.get(position);
         user.setUnReadMessageCount(0);
         mAdapter.notifyItemChanged(position);
         startChatActivity(user);
@@ -233,10 +267,11 @@ public class FriendsListFragment extends BaseFragment implements FriendsListCont
         Intent intent = new Intent(mActivity, ChatActivity.class);
 
         Bundle bundle = new Bundle();
-        bundle.putLong(AppConstants.IntentKey.USER, user.getUser().getId());
-        bundle.putString(AppConstants.IntentKey.USER_NAME, user.getUser().name);
+        bundle.putLong(AppConstants.IntentKey.USER, Long.valueOf(user.getUser().getUserId()));
+        bundle.putString(AppConstants.IntentKey.USER_NAME, user.getUser().getUserName());
         intent.putExtra(AppConstants.IntentKey.EXTRA_DATA, bundle);
 
         startActivity(intent);
     }
+
 }

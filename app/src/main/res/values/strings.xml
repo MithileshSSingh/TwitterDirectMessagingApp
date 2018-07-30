@@ -8,4 +8,5 @@
     <string name="default_notification_channel_id">10000</string>
     <string name="twitter_consumer_key">dyTvRhh70IP9RcFISdLaTEi4d</string>
     <string name="twitter_consumer_secret">lfFaQzdXu04GTzjDCwF4CGXCsCVm06TSwblSCCGJiI6v4LeNZ6</string>
+
 </resources>

@@ -6,9 +6,9 @@ import android.content.Context;
 import com.example.mithilesh.twitterdirectmessageapp.data.DataSource;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.LocalDataSource;
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
+import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.TwitterUser;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.Event;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.RequestSendMessage;
-import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseFriends;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseGetMessage;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseSendMessage;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
@@ -17,7 +17,9 @@ import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.models.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -69,23 +71,6 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void getAllFriendsList(final GetAllFriendsListCallBack callBack) {
-        Call<ResponseFriends> call = mApiClient.getAPICalls().getAllFriends();
-
-        call.enqueue(new Callback<ResponseFriends>() {
-            @Override
-            public void success(Result<ResponseFriends> result) {
-                callBack.success(result.data);
-            }
-
-            @Override
-            public void failure(TwitterException exception) {
-                callBack.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
-            }
-        });
-    }
-
-    @Override
     public void sendMessage(Event event, final OnMessageSendCallBack callback) {
         RequestSendMessage requestSendMessage = new RequestSendMessage();
         requestSendMessage.setEvent(event);
@@ -101,6 +86,7 @@ public class RemoteDataSource implements DataSource {
 
             @Override
             public void failure(TwitterException exception) {
+                exception.printStackTrace();
                 callback.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
             }
         });
@@ -120,6 +106,7 @@ public class RemoteDataSource implements DataSource {
 
             @Override
             public void failure(TwitterException exception) {
+                exception.printStackTrace();
                 callBack.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
             }
         });
@@ -140,9 +127,42 @@ public class RemoteDataSource implements DataSource {
 
             @Override
             public void failure(TwitterException exception) {
+                exception.printStackTrace();
                 callBack.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
             }
         });
+    }
+
+    @Override
+    public void loadUserDetailFromRemoteToDb(ArrayList<String> listUserIds, final LoadUserFromRemoteToDbCallBack callBack) {
+
+        String userIds = "";
+        for (int i = 0; i < listUserIds.size(); i++) {
+            userIds = userIds + "," + listUserIds.get(i);
+        }
+
+        userIds = userIds.substring(1);
+
+        Call<List<User>> call = mApiClient.getAPICalls().getUsersDetails(userIds);
+
+        call.enqueue(new Callback<List<User>>() {
+            @Override
+            public void success(Result<List<User>> result) {
+                if (result != null && result.data != null && result.data.size() > 0) {
+
+                    ArrayList<User> resultList = new ArrayList<>(result.data);
+
+                    callBack.success(resultList);
+                }
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                exception.printStackTrace();
+                callBack.failed(exception.getMessage().contains("401") ? 401 : 0, exception.getMessage());
+            }
+        });
+
     }
 
     @Override
@@ -156,13 +176,28 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void insertIntoDb(List<Message> messages) {
+    public void insertMessageIntoDb(List<Message> messages) {
 
     }
 
     @Override
-    public void deleteAllFromDb() {
+    public void deleteAllMessagesFromDb() {
 
+    }
+
+    @Override
+    public void insertUserIntoDb(List<TwitterUser> twitterUser) {
+
+    }
+
+    @Override
+    public void deleteAllUserFromDb() {
+
+    }
+
+    @Override
+    public TwitterUser getUserById(long userId) {
+        return null;
     }
 
     @Override
@@ -182,6 +217,11 @@ public class RemoteDataSource implements DataSource {
 
     @Override
     public LiveData<List<Message>> getAllUnseenMessages(boolean isSeen) {
+        return null;
+    }
+
+    @Override
+    public LiveData<List<TwitterUser>> getAllUsers() {
         return null;
     }
 }

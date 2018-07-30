@@ -33,7 +33,7 @@ public class GetDirectMessageJobService extends JobService {
 
             @Override
             public void failed(int errorCode, String errorMessage) {
-                Log.v(TAG, "Error while loading and saving data to db");
+                Log.v(TAG, "Error while loading and saving data to db : error :"+errorCode+" + " +errorMessage);
             }
         });
         

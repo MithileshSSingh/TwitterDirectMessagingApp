@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public interface MessageDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert
     void insert(Message message);
 
     @Query("DELETE FROM message")

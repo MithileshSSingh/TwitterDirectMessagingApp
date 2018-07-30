@@ -4,13 +4,16 @@ package com.example.mithilesh.twitterdirectmessageapp.data;
 import android.arch.lifecycle.LiveData;
 
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
+import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.TwitterUser;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.Event;
-import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseFriends;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseGetMessage;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseSendMessage;
 import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Repository implements DataSource {
@@ -44,25 +47,6 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getAllFriendsList(final GetAllFriendsListCallBack callBack) {
-        mRemoteDataSource.getAllFriendsList(new GetAllFriendsListCallBack() {
-            @Override
-            public void success(ResponseFriends firendsList) {
-                callBack.success(firendsList);
-            }
-
-            @Override
-            public void failed(int errorCode, String errorMessage) {
-                if (errorCode == 401) {
-                    mLocalDataSource.deleteAllFromDb();
-                    TwitterCore.getInstance().getSessionManager().clearActiveSession();
-                }
-                callBack.failed(errorCode, errorMessage);
-            }
-        });
-    }
-
-    @Override
     public void sendMessage(final Event event, final OnMessageSendCallBack callback) {
         mRemoteDataSource.sendMessage(event, new OnMessageSendCallBack() {
             @Override
@@ -76,7 +60,7 @@ public class Repository implements DataSource {
                 ArrayList<Message> messageList = new ArrayList<>();
                 messageList.add(message);
 
-                mLocalDataSource.insertIntoDb(messageList);
+                mLocalDataSource.insertMessageIntoDb(messageList);
 
                 callback.success(responseSendMessage);
             }
@@ -84,7 +68,7 @@ public class Repository implements DataSource {
             @Override
             public void failed(int errorCode, String errorMsg) {
                 if (errorCode == 401) {
-                    mLocalDataSource.deleteAllFromDb();
+                    mLocalDataSource.deleteAllMessagesFromDb();
                     TwitterCore.getInstance().getSessionManager().clearActiveSession();
                 }
 
@@ -104,7 +88,7 @@ public class Repository implements DataSource {
             @Override
             public void failed(int errCode, String errorMessage) {
                 if (errCode == 401) {
-                    mLocalDataSource.deleteAllFromDb();
+                    mLocalDataSource.deleteAllMessagesFromDb();
                     TwitterCore.getInstance().getSessionManager().clearActiveSession();
                 }
                 callBack.failed(errCode, errorMessage);
@@ -117,18 +101,48 @@ public class Repository implements DataSource {
 
         mRemoteDataSource.loadMessageFromRemoteToDb(new LoadMessageFromRemoteToDbCallBack() {
             @Override
-            public void success(List<Event> eventList) {
+            public void success(final List<Event> eventList) {
                 if (eventList != null && eventList.size() > 0) {
+
                     mLocalDataSource.saveMessageToDb(eventList, new SaveMessageToDbCallBack() {
                         @Override
                         public void success() {
+
+                            HashMap<String, TwitterUser> userHashMap = new HashMap<>();
+                            ArrayList<TwitterUser> listTwitterUser = new ArrayList<>();
+
+                            TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
+                            String myUserId = String.valueOf(session.getUserId());
+                            for (Event event : eventList) {
+
+                                TwitterUser twitterUser = new TwitterUser();
+
+
+                                String senderId = event.getMessageCreate().getSenderId();
+                                String recipientId = event.getMessageCreate().getTarget().getRecipientId();
+
+                                if (!myUserId.equals(senderId)) {
+                                    twitterUser.setUserId(senderId);
+                                }else if(!myUserId.equals(recipientId)){
+                                    twitterUser.setUserId(recipientId);
+                                }
+
+                                if (!userHashMap.containsKey(senderId)) {
+                                    userHashMap.put(senderId, twitterUser);
+                                    listTwitterUser.add(twitterUser);
+                                }
+                            }
+
+                            mLocalDataSource.insertUserIntoDb(listTwitterUser);
+
                             callBack.success(null);
+
                         }
 
                         @Override
                         public void failed(int errorCode, String errorMessage) {
                             if (errorCode == 401) {
-                                mLocalDataSource.deleteAllFromDb();
+                                mLocalDataSource.deleteAllMessagesFromDb();
                                 TwitterCore.getInstance().getSessionManager().clearActiveSession();
                             }
                             callBack.failed(errorCode, errorMessage);
@@ -140,13 +154,46 @@ public class Repository implements DataSource {
             @Override
             public void failed(int errorCode, String errorMessage) {
                 if (errorCode == 401) {
-                    mLocalDataSource.deleteAllFromDb();
+                    mLocalDataSource.deleteAllMessagesFromDb();
                     TwitterCore.getInstance().getSessionManager().clearActiveSession();
                 }
                 callBack.failed(errorCode, errorMessage);
             }
         });
 
+    }
+
+    @Override
+    public void loadUserDetailFromRemoteToDb(ArrayList<String> listUserIds, final LoadUserFromRemoteToDbCallBack callBack) {
+        mRemoteDataSource.loadUserDetailFromRemoteToDb(listUserIds, new LoadUserFromRemoteToDbCallBack() {
+            @Override
+            public void success(ArrayList<User> users) {
+
+                ArrayList<TwitterUser> listTwitterUser = new ArrayList<>();
+
+                for (User user : users) {
+                    TwitterUser twitterUser = new TwitterUser();
+
+                    twitterUser.setUserId(String.valueOf(user.getId()));
+                    twitterUser.setUserName(String.valueOf(user.name));
+                    twitterUser.setUserScreenName(String.valueOf(user.screenName));
+                    twitterUser.setProfileImageUrl(String.valueOf(user.profileImageUrlHttps));
+
+                    listTwitterUser.add(twitterUser);
+                }
+
+                if (listTwitterUser.size() > 0) {
+                    mLocalDataSource.insertUserIntoDb(listTwitterUser);
+                }
+
+                callBack.success(users);
+            }
+
+            @Override
+            public void failed(int errorCode, String errorMessage) {
+                callBack.failed(errorCode, errorMessage);
+            }
+        });
     }
 
     @Override
@@ -170,14 +217,29 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void insertIntoDb(List<Message> messages) {
-        mLocalDataSource.insertIntoDb(messages);
+    public void insertMessageIntoDb(List<Message> messages) {
+        mLocalDataSource.insertMessageIntoDb(messages);
     }
 
 
     @Override
-    public void deleteAllFromDb() {
-        mLocalDataSource.deleteAllFromDb();
+    public void deleteAllMessagesFromDb() {
+        mLocalDataSource.deleteAllMessagesFromDb();
+    }
+
+    @Override
+    public void insertUserIntoDb(List<TwitterUser> twitterUser) {
+        mLocalDataSource.insertUserIntoDb(twitterUser);
+    }
+
+    @Override
+    public void deleteAllUserFromDb() {
+        mLocalDataSource.deleteAllUserFromDb();
+    }
+
+    @Override
+    public TwitterUser getUserById(long userId) {
+        return mLocalDataSource.getUserById(userId);
     }
 
     @Override
@@ -198,5 +260,10 @@ public class Repository implements DataSource {
     @Override
     public LiveData<List<Message>> getAllUnseenMessages(boolean isSeen) {
         return mLocalDataSource.getAllUnseenMessages(isSeen);
+    }
+
+    @Override
+    public LiveData<List<TwitterUser>> getAllUsers() {
+        return mLocalDataSource.getAllUsers();
     }
 }

@@ -4,16 +4,16 @@ package com.example.mithilesh.twitterdirectmessageapp.data;
 import android.arch.lifecycle.LiveData;
 
 import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.Message;
+import com.example.mithilesh.twitterdirectmessageapp.data.local.entities.TwitterUser;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.Event;
-import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseFriends;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseGetMessage;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.model.ResponseSendMessage;
+import com.twitter.sdk.android.core.models.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface DataSource {
-
-    void getAllFriendsList(GetAllFriendsListCallBack callBack);
 
     void sendMessage(Event event, OnMessageSendCallBack callback);
 
@@ -21,13 +21,21 @@ public interface DataSource {
 
     void loadMessageFromRemoteToDb(LoadMessageFromRemoteToDbCallBack callBack);
 
+    void loadUserDetailFromRemoteToDb(ArrayList<String> listUserIds, LoadUserFromRemoteToDbCallBack callBack);
+
     void setMessageAsSeen(long myId, long recipientId, CommonCallBack callBack);
 
     void saveMessageToDb(List<Event> eventList, SaveMessageToDbCallBack callBack);
 
-    void insertIntoDb(List<Message> messages);
+    void insertMessageIntoDb(List<Message> messages);
 
-    void deleteAllFromDb();
+    void deleteAllMessagesFromDb();
+
+    void insertUserIntoDb(List<TwitterUser> twitterUser);
+
+    void deleteAllUserFromDb();
+
+    TwitterUser getUserById(long userId);
 
     LiveData<List<Message>> getAllMessagesFromDb();
 
@@ -37,12 +45,7 @@ public interface DataSource {
 
     LiveData<List<Message>> getAllUnseenMessages(boolean isSeen);
 
-
-    interface GetAllFriendsListCallBack {
-        void success(ResponseFriends firendsList);
-
-        void failed(int errorCode, String errorMessage);
-    }
+    LiveData<List<TwitterUser>> getAllUsers();
 
     interface OnMessageGetCallBack {
         void success(ResponseGetMessage responseGetMessage);
@@ -74,4 +77,9 @@ public interface DataSource {
         void failed(int errorCode, String errorMessage);
     }
 
+    interface LoadUserFromRemoteToDbCallBack {
+        void success(ArrayList<User> user);
+
+        void failed(int errorCode, String errorMessage);
+    }
 }

@@ -2,18 +2,21 @@ package com.example.mithilesh.twitterdirectmessageapp.mvp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 
 import com.example.mithilesh.twitterdirectmessageapp.R;
+import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_chat.ChatFragment;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_friends_list.FriendsListFragment;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_login.LoginActivity;
 import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_login.LoginFragment;
-import com.example.mithilesh.twitterdirectmessageapp.mvp.screen_chat.ChatFragment;
 import com.example.mithilesh.twitterdirectmessageapp.utils.ActivityUtils;
 import com.example.mithilesh.twitterdirectmessageapp.utils.AppConstants;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.twitter.sdk.android.core.TwitterCore;
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -111,6 +114,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void logOut() {
         TwitterCore.getInstance().getSessionManager().clearActiveSession();
+
+        SharedPreferences sharedPreferences = mActivity.getSharedPreferences(AppConstants.SHARED_PREFERENCE_NAME,mActivity.MODE_PRIVATE);
+        sharedPreferences.edit().clear().apply();
+
+        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mActivity.getApplicationContext()));
+        dispatcher.cancelAll();
+
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
